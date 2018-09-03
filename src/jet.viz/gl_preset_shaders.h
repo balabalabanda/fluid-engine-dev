@@ -4,8 +4,8 @@
 // personal capacity and am not conveying any rights to any intellectual
 // property of any third parties.
 
-#ifndef SRC_JET_VIZ_GL_GL_PRESET_SHADERS_H_
-#define SRC_JET_VIZ_GL_GL_PRESET_SHADERS_H_
+#ifndef SRC_JET_VIZ_GL_PRESET_SHADERS_H_
+#define SRC_JET_VIZ_GL_PRESET_SHADERS_H_
 
 #ifdef JET_USE_GL
 
@@ -208,4 +208,4 @@ const GLchar* kPointSpriteShaders[3] = {
 
 #endif  // JET_USE_GL
 
-#endif  // SRC_JET_VIZ_GL_GL_PRESET_SHADERS_H_
+#endif  // SRC_JET_VIZ_GL_PRESET_SHADERS_H_

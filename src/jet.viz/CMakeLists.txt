@@ -50,6 +50,12 @@ if (USE_CUDA)
             ${sources}
             ${CMAKE_CURRENT_SOURCE_DIR}/*.cu)
 endif()
+if (APPLE)
+    file(GLOB sources
+            ${sources}
+            ${CMAKE_CURRENT_SOURCE_DIR}/*.mm
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/mtlpp/*.mm)
+endif()
 
 # Custom-build event
 set(jet_viz_header_gen_py ${root_dir}/scripts/header_gen.py)

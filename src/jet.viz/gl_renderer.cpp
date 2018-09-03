@@ -155,7 +155,7 @@ ShaderPtr GLRenderer::createPresetShader(const std::string& shaderName) const {
             kPointSpriteShaders[1], kPointSpriteShaders[2]);
     }
 
-    return ShaderPtr();
+    return nullptr;
 }
 
 void GLRenderer::setPrimitiveType(PrimitiveType type) { _primitiveType = type; }

@@ -28,9 +28,9 @@ class GLShader final : public Shader {
     //! Constructs a shader with user-given render parameters, vertex format,
     //! vertex shader, and fragment shader.
     //!
-    //! \param userRenderParams User-given render parameters.
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
+    //! \param userRenderParams     User-given render parameters.
+    //! \param vertexFormat         Vertex format.
+    //! \param vertexShaderSource   Vertex shader in string.
     //! \param fragmentShaderSource Fragment shader in string.
     //!
     GLShader(const RenderParameters& userRenderParams,
@@ -42,10 +42,10 @@ class GLShader final : public Shader {
     //! Constructs a shader with user-given render parameters, vertex format,
     //! vertex shader, geometry shader, and fragment shader.
     //!
-    //! \param userRenderParams User-given render parameters.
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
-    //! \param geometryShader Geometry shader in string.
+    //! \param userRenderParams     User-given render parameters.
+    //! \param vertexFormat         Vertex format.
+    //! \param vertexShaderSource   Vertex shader in string.
+    //! \param geometryShader       Geometry shader in string.
     //! \param fragmentShaderSource Fragment shader in string.
     //!
     GLShader(const RenderParameters& userRenderParams,
@@ -63,25 +63,25 @@ class GLShader final : public Shader {
     //!
     //! Loads vertex and fragment shaders.
     //!
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
+    //! \param vertexFormat         Vertex format.
+    //! \param vertexShaderSource   Vertex shader in string.
     //! \param fragmentShaderSource Fragment shader in string.
     //!
     void load(const VertexFormat& vertexFormat,
               const std::string& vertexShaderSource,
-              const std::string& fragmentShaderSource) override;
+              const std::string& fragmentShaderSource);
 
     //!
     //! Loads vertex, geometry, and fragment shaders.
     //!
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
-    //! \param geometryShader Geometry shader in string.
+    //! \param vertexFormat         Vertex format.
+    //! \param vertexShaderSource   Vertex shader in string.
+    //! \param geometryShader       Geometry shader in string.
     //! \param fragmentShaderSource Fragment shader in string.
     //!
     void load(const VertexFormat& vertexFormat, const std::string& vertexShader,
               const std::string& geometryShader,
-              const std::string& fragmentShader) override;
+              const std::string& fragmentShader);
 
     //! Returns OpenGL program object handle.
     unsigned int program() const;
@@ -89,9 +89,9 @@ class GLShader final : public Shader {
  private:
     unsigned int _program = 0;
 
-    void onBind(Renderer* renderer) override;
+    void onBind(const Renderer* renderer) override;
 
-    void onUnbind(Renderer* renderer) override;
+    void onUnbind(const Renderer* renderer) override;
 };
 
 typedef std::shared_ptr<GLShader> GLShaderPtr;

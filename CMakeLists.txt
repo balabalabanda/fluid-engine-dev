@@ -41,17 +41,19 @@ elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_definitions(-DDEBUG)
 endif()
 
+# Find Apple-specific libraries
+if (APPLE)
+    find_library(COCOA_LIB Cocoa)
+    find_library(COREFOUNDATION_LIB CoreFoundation)
+else()
+    set(COCOA_LIB "")
+    set(COREFOUNDATION_LIB "")
+endif()
+
 # OpenGL
 option(USE_GL "Use OpenGL features" ON)
 if (USE_GL)
     find_package(OpenGL REQUIRED)
-
-    # Add Apple-specific libraries
-    if (APPLE)
-        find_library(COREFOUNDATION_LIB CoreFoundation)
-    else()
-        set(COREFOUNDATION_LIB "")
-    endif()
 
     # Add GLFW3
     if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -198,6 +200,9 @@ add_subdirectory(src/tests/time_perf_tests)
 add_subdirectory(src/tests/unit_tests)
 if (USE_GL)
     add_subdirectory(src/tests/opengl_tests)
+endif()
+if (APPLE)
+    add_subdirectory(src/tests/metal_tests)
 endif()
 add_subdirectory(src/examples/common)
 add_subdirectory(src/examples/hello_fluid_sim)

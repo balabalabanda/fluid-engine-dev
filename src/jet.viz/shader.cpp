@@ -20,9 +20,9 @@ Shader::Shader(const RenderParameters& userRenderParams)
 
 Shader::~Shader() {}
 
-void Shader::bind(Renderer* renderer) { onBind(renderer); }
+void Shader::bind(const Renderer* renderer) { onBind(renderer); }
 
-void Shader::unbind(Renderer* renderer) { onUnbind(renderer); }
+void Shader::unbind(const Renderer* renderer) { onUnbind(renderer); }
 
 VertexFormat Shader::vertexFormat() const { return _vertexFormat; }
 
@@ -47,8 +47,7 @@ void Shader::setViewHeight(float viewHeight) {
     _defaultRenderParams.set("ViewHeight", viewHeight);
 }
 
-void Shader::setUserRenderParameter(const std::string& name,
-                                    int32_t newValue) {
+void Shader::setUserRenderParameter(const std::string& name, int32_t newValue) {
     _userRenderParams.set(name, newValue);
 }
 

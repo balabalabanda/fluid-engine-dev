@@ -4,6 +4,10 @@
 // personal capacity and am not conveying any rights to any intellectual
 // property of any third parties.
 
+#include <pch.h>
+
+#ifdef JET_USE_CUDA
+
 #include <jet/cuda_point_hash_grid_searcher2.h>
 
 using namespace jet;
@@ -52,3 +56,5 @@ CudaPointHashGridSearcher2& CudaPointHashGridSearcher2::operator=(
     set(other);
     return (*this);
 }
+
+#endif  // JET_USE_CUDA

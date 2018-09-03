@@ -185,7 +185,7 @@ void GLShader::load(const VertexFormat& vertexFormat,
     printProgramInfoLog(_program);
 }
 
-void GLShader::onBind(Renderer* renderer) {
+void GLShader::onBind(const Renderer* renderer) {
     glUseProgram(_program);
 
     // Load default parameters
@@ -203,7 +203,7 @@ void GLShader::onBind(Renderer* renderer) {
     applyParameters(_program, userRenderParameters());
 }
 
-void GLShader::onUnbind(Renderer* renderer) {
+void GLShader::onUnbind(const Renderer* renderer) {
     UNUSED_VARIABLE(renderer);
 
     glUseProgram(0);

@@ -1,0 +1,32 @@
+// Copyright (c) 2018 Doyub Kim
+//
+// I am making my contributions/submissions to this project solely in my
+// personal capacity and am not conveying any rights to any intellectual
+// property of any third parties.
+
+#ifndef SRC_JET_VIZ_METAL_WRAPPERS_H_
+#define SRC_JET_VIZ_METAL_WRAPPERS_H_
+
+#import "3rdparty/mtlpp/mtlpp.hpp"
+
+namespace jet {
+namespace viz {
+
+#define MTLPP_WRAPPER_CLASS(Type)                                  \
+    class Metal##Type final {                                      \
+     public:                                                       \
+        mtlpp::Type value;                                         \
+        Metal##Type(const mtlpp::Type& val) : value(val) {}        \
+        Metal##Type(mtlpp::Type&& val) { value = std::move(val); } \
+    };
+
+MTLPP_WRAPPER_CLASS(CommandQueue)
+MTLPP_WRAPPER_CLASS(Device)
+MTLPP_WRAPPER_CLASS(Function)
+MTLPP_WRAPPER_CLASS(Library)
+MTLPP_WRAPPER_CLASS(RenderPipelineState)
+
+}  // namespace viz
+}  // namespace jet
+
+#endif  // SRC_JET_VIZ_METAL_WRAPPERS_H_

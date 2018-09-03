@@ -37,35 +37,11 @@ class Shader {
     //! Clears the contents.
     virtual void clear() = 0;
 
-    //!
-    //! Loads vertex and fragment shaders.
-    //!
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
-    //! \param fragmentShaderSource Fragment shader in string.
-    //!
-    virtual void load(const VertexFormat& vertexFormat,
-                      const std::string& vertexShaderSource,
-                      const std::string& fragmentShaderSource) = 0;
-
-    //!
-    //! Loads vertex, geometry, and fragment shaders.
-    //!
-    //! \param vertexFormat Vertex format.
-    //! \param vertexShaderSource Vertex shader in string.
-    //! \param geometryShader Geometry shader in string.
-    //! \param fragmentShaderSource Fragment shader in string.
-    //!
-    virtual void load(const VertexFormat& vertexFormat,
-                      const std::string& vertexShaderSource,
-                      const std::string& geometryShaderSource,
-                      const std::string& fragmentShaderSource) = 0;
-
     //! Binds the shader to given \p renderer.
-    void bind(Renderer* renderer);
+    void bind(const Renderer* renderer);
 
     //! Unbinds the shader from given \p renderer.
-    void unbind(Renderer* renderer);
+    void unbind(const Renderer* renderer);
 
     //! Returns input vertex format for this shader.
     VertexFormat vertexFormat() const;
@@ -122,10 +98,10 @@ class Shader {
     VertexFormat _vertexFormat = VertexFormat::Position3;
 
     //! Called when the shader is bound.
-    virtual void onBind(Renderer* renderer) = 0;
+    virtual void onBind(const Renderer* renderer) = 0;
 
     //! Called when the shader is unbound.
-    virtual void onUnbind(Renderer* renderer) = 0;
+    virtual void onUnbind(const Renderer* renderer) = 0;
 
  private:
     RenderParameters _defaultRenderParams;

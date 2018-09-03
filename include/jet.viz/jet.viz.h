@@ -25,6 +25,10 @@
 #include <jet.viz/index_buffer.h>
 #include <jet.viz/input_events.h>
 #include <jet.viz/jet.viz.h>
+#include <jet.viz/metal_app.h>
+#include <jet.viz/metal_renderer.h>
+#include <jet.viz/metal_shader.h>
+#include <jet.viz/metal_window.h>
 #include <jet.viz/ortho_camera.h>
 #include <jet.viz/ortho_view_controller.h>
 #include <jet.viz/persp_camera.h>

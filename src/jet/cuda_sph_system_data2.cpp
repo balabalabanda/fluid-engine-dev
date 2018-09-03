@@ -4,6 +4,10 @@
 // personal capacity and am not conveying any rights to any intellectual
 // property of any third parties.
 
+#include <pch.h>
+
+#ifdef JET_USE_CUDA
+
 #include <jet/cuda_sph_system_data2.h>
 #include <jet/sph_kernels2.h>
 #include <jet/triangle_point_generator.h>
@@ -130,3 +134,5 @@ void CudaSphSystemData2::computeMass() {
 
     _mass = static_cast<float>(_targetDensity / maxNumberDensity);
 }
+
+#endif  // JET_USE_CUDA
