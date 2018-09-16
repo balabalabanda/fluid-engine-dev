@@ -13,17 +13,34 @@
 
 using namespace jet::viz;
 
-MetalShader::MetalShader(const RenderParameters& userRenderParams)
-    : Shader(userRenderParams) {}
-
-MetalShader::MetalShader(const MetalDevice* device,
+MetalShader::MetalShader(const std::string& name,
+                         const MetalPrivateDevice* device,
                          const RenderParameters& userRenderParams,
+                         const VertexFormat& vertexFormat,
                          const std::string& shaderSource)
-    : Shader(userRenderParams) {
-    load(device, shaderSource);
+    : Shader(userRenderParams), _name(name) {
+    load(device, vertexFormat, shaderSource);
 }
 
 MetalShader::~MetalShader() { clear(); }
+
+MetalPrivateLibrary* MetalShader::library() const { return _library; }
+
+MetalPrivateFunction* MetalShader::vertexFunction() const { return _vertFunc; }
+
+MetalPrivateFunction* MetalShader::fragmentFunction() const {
+    return _fragFunc;
+}
+
+const std::string& MetalShader::name() const { return _name; }
+
+void MetalShader::onBind(const Renderer* renderer) {
+    UNUSED_VARIABLE(renderer);
+}
+
+void MetalShader::onUnbind(const Renderer* renderer) {
+    UNUSED_VARIABLE(renderer);
+}
 
 void MetalShader::clear() {
     if (_library != nullptr) {
@@ -42,26 +59,24 @@ void MetalShader::clear() {
     }
 }
 
-void MetalShader::load(const MetalDevice* device,
+void MetalShader::load(const MetalPrivateDevice* device,
+                       const VertexFormat& vertexFormat,
                        const std::string& shaderSource) {
+    _vertexFormat = vertexFormat;
+
     mtlpp::Device d = device->value;
-    _library = new MetalLibrary(d.NewLibrary(
-        shaderSource.c_str(), mtlpp::CompileOptions(), nullptr));
 
-    _vertFunc = new MetalFunction(_library->value.NewFunction("vertFunc"));
-    _fragFunc = new MetalFunction(_library->value.NewFunction("fragFunc"));
-}
+    ns::Error error(ns::Handle{.ptr = nullptr});
+    _library = new MetalPrivateLibrary(
+        d.NewLibrary(shaderSource.c_str(), mtlpp::CompileOptions(), &error));
 
-MetalLibrary* MetalShader::library() const { return _library; }
+    if (error.GetPtr() != nullptr) {
+        ns::String errorDesc = error.GetLocalizedDescription();
+        JET_ERROR << errorDesc.GetCStr();
+    }
 
-MetalFunction* MetalShader::vertexFunction() const { return _vertFunc; }
-
-MetalFunction* MetalShader::fragmentFunction() const { return _fragFunc; }
-
-void MetalShader::onBind(const Renderer* renderer) {
-    UNUSED_VARIABLE(renderer);
-}
-
-void MetalShader::onUnbind(const Renderer* renderer) {
-    UNUSED_VARIABLE(renderer);
+    _vertFunc =
+        new MetalPrivateFunction(_library->value.NewFunction("vertFunc"));
+    _fragFunc =
+        new MetalPrivateFunction(_library->value.NewFunction("fragFunc"));
 }

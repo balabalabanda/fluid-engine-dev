@@ -6,6 +6,7 @@
 
 #include <jet.viz/metal_app.h>
 #include <jet.viz/metal_window.h>
+#include <jet.viz/triangle_renderable.h>
 
 using namespace jet::viz;
 
@@ -13,6 +14,12 @@ int main() {
     MetalApp::initialize();
 
     auto window = MetalApp::createWindow("Metal Tests", 1280, 720);
+
+    auto renderer = window->renderer();
+    renderer->setBackgroundColor(Color{1, 1, 1, 1});
+
+    auto renderable = std::make_shared<TriangleRenderable>(renderer.get());
+    renderer->addRenderable(renderable);
 
     MetalApp::run();
 

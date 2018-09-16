@@ -32,6 +32,9 @@ class MetalWindow final {
     MetalWindow(const std::string& title, int width, int height);
     ~MetalWindow();
 
+    //! Returns Metal renderer.
+    const MetalRendererPtr& renderer() const;
+
     MetalView* view() const;
 
     static void render(const MetalWindow& window);

@@ -7,18 +7,18 @@
 #ifndef INCLUDE_JET_VIZ_METAL_RENDERER_H_
 #define INCLUDE_JET_VIZ_METAL_RENDERER_H_
 
+#ifdef JET_MACOSX
+
 #include <jet.viz/renderer.h>
 #include <jet/macros.h>
-
-#ifdef JET_MACOSX
 
 namespace jet {
 namespace viz {
 
 class MetalWindow;
-class MetalDevice;
-class MetalCommandQueue;
-class MetalRenderPipelineState;
+class MetalPrivateDevice;
+class MetalPrivateCommandQueue;
+class MetalPrivateRenderPipelineState;
 
 class MetalRenderer final : public Renderer {
  public:
@@ -116,9 +116,8 @@ class MetalRenderer final : public Renderer {
 
     void render(const MetalWindow* window);
 
-    MetalDevice* device() const;
-    MetalCommandQueue* commandQueue() const;
-    MetalRenderPipelineState* renderPipelineState() const;
+    MetalPrivateDevice* device() const;
+    MetalPrivateCommandQueue* commandQueue() const;
 
  protected:
     //! Called when rendering a frame begins.
@@ -134,9 +133,11 @@ class MetalRenderer final : public Renderer {
     void onSetRenderStates(const RenderStates& states) override;
 
  private:
-    MetalDevice* _device = nullptr;
-    MetalCommandQueue* _commandQueue = nullptr;
-    MetalRenderPipelineState* _renderPipelineState = nullptr;
+    MetalPrivateDevice* _device = nullptr;
+    MetalPrivateCommandQueue* _commandQueue = nullptr;
+
+    mutable std::unordered_map<std::string, MetalPrivateRenderPipelineState*>
+        _renderPipelineStates;
 };
 
 typedef std::shared_ptr<MetalRenderer> MetalRendererPtr;

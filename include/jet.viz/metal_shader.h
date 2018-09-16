@@ -14,63 +14,58 @@
 namespace jet {
 namespace viz {
 
-class MetalDevice;
-class MetalLibrary;
-class MetalFunction;
+class MetalPrivateDevice;
+class MetalPrivateLibrary;
+class MetalPrivateFunction;
 
 //! Metal shader.
 class MetalShader final : public Shader {
  public:
     //!
-    //! Constructs a shader with user-given render parameters.
-    //!
-    //! \param userRenderParams User-given render parameters.
-    //!
-    MetalShader(const RenderParameters& userRenderParams);
-
-    //!
     //! Constructs a shader with user-given render parameters, vertex format,
     //! vertex shader, and fragment shader.
     //!
+    //! \param name             Shader name.
     //! \param device           Metal device.
     //! \param userRenderParams User-given render parameters.
+    //! \param vertexFormat     Vertex format of this shader.
     //! \param shaderSource     Shader in string.
     //!
-    MetalShader(const MetalDevice* device,
+    MetalShader(const std::string& name, const MetalPrivateDevice* device,
                 const RenderParameters& userRenderParams,
+                const VertexFormat& vertexFormat,
                 const std::string& shaderSource);
 
     //! Destructor.
     virtual ~MetalShader();
 
-    //! Clears the contents.
-    void clear() override;
-
-    //!
-    //! Loads vertex and fragment shaders.
-    //!
-    //! \param device       Metal device.
-    //! \param shaderSource Shader in string.
-    //!
-    void load(const MetalDevice* device, const std::string& shaderSource);
-
     //! Returns Metal Library pointer.
-    MetalLibrary* library() const;
+    MetalPrivateLibrary* library() const;
 
     //! Returns Metal Function pointer for vertex function (shader).
-    MetalFunction* vertexFunction() const;
+    MetalPrivateFunction* vertexFunction() const;
 
     //! Returns Metal Function pointer for fragment function (shader).
-    MetalFunction* fragmentFunction() const;
+    MetalPrivateFunction* fragmentFunction() const;
+
+    //! Returns the name of the shader.
+    const std::string& name() const;
 
  private:
-    MetalLibrary* _library = nullptr;
-    MetalFunction* _vertFunc = nullptr;
-    MetalFunction* _fragFunc = nullptr;
+    std::string _name;
+    MetalPrivateLibrary* _library = nullptr;
+    MetalPrivateFunction* _vertFunc = nullptr;
+    MetalPrivateFunction* _fragFunc = nullptr;
 
     void onBind(const Renderer* renderer) override;
 
     void onUnbind(const Renderer* renderer) override;
+
+    void clear() override;
+
+    void load(const MetalPrivateDevice* device,
+              const VertexFormat& vertexFormat,
+              const std::string& shaderSource);
 };
 
 typedef std::shared_ptr<MetalShader> MetalShaderPtr;

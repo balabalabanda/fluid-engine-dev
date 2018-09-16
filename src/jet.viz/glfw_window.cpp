@@ -8,6 +8,8 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
+
 #include <jet.viz/glfw_window.h>
 #include <jet.viz/persp_camera.h>
 #include <jet.viz/pitch_yaw_view_controller.h>

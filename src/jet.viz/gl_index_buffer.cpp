@@ -8,6 +8,8 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
+
 #include <jet.viz/gl_index_buffer.h>
 #include <jet.viz/gl_vertex_buffer.h>
 
@@ -35,8 +37,7 @@ void GLIndexBuffer::onClear() {
 }
 
 void GLIndexBuffer::onResize(const VertexBufferPtr& vertexBuffer,
-                             const uint32_t* indices,
-                             size_t numberOfIndices) {
+                             const uint32_t* indices, size_t numberOfIndices) {
     const auto& glVertexBuffer =
         std::dynamic_pointer_cast<GLVertexBuffer>(vertexBuffer);
     JET_ASSERT(glVertexBuffer != nullptr);
@@ -46,9 +47,8 @@ void GLIndexBuffer::onResize(const VertexBufferPtr& vertexBuffer,
 
     glGenBuffers(1, &_bufferId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _bufferId);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 sizeof(uint32_t) * numberOfIndices, indices,
-                 GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * numberOfIndices,
+                 indices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);

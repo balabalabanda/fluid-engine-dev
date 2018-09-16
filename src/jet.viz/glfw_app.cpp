@@ -8,6 +8,8 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
+
 #include <jet.viz/glfw_app.h>
 #include <jet.viz/glfw_window.h>
 
@@ -154,7 +156,7 @@ Event<GLFWwindow*, int, const char**>& GlfwApp::onGlfwDropEvent() {
 
 void GlfwApp::onSetCurrentWindow(const GlfwWindowPtr& window) {
     JET_ASSERT(std::find(sWindows.begin(), sWindows.end(), window) !=
-           sWindows.end());
+               sWindows.end());
 
     sCurrentWindow = window;
 }
@@ -178,8 +180,7 @@ void GlfwApp::onKey(GLFWwindow* glfwWindow, int key, int scancode, int action,
     JET_ASSERT(window != nullptr);
     window->requestRender();
 
-    bool handled =
-        sOnGlfwKeyEvent(glfwWindow, key, scancode, action, mods);
+    bool handled = sOnGlfwKeyEvent(glfwWindow, key, scancode, action, mods);
     if (handled) {
         return;
     }
@@ -193,8 +194,7 @@ void GlfwApp::onMouseButton(GLFWwindow* glfwWindow, int button, int action,
     JET_ASSERT(window != nullptr);
     window->requestRender();
 
-    bool handled =
-        sOnGlfwMouseButtonEvent(glfwWindow, button, action, mods);
+    bool handled = sOnGlfwMouseButtonEvent(glfwWindow, button, action, mods);
     if (handled) {
         return;
     }
@@ -270,8 +270,7 @@ void GlfwApp::onDrop(GLFWwindow* glfwWindow, int numDroppedFiles,
     JET_ASSERT(window != nullptr);
     window->requestRender();
 
-    bool handled =
-        sOnGlfwDropEvent(glfwWindow, numDroppedFiles, pathNames);
+    bool handled = sOnGlfwDropEvent(glfwWindow, numDroppedFiles, pathNames);
     if (handled) {
         return;
     }

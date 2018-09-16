@@ -4,64 +4,159 @@
 // personal capacity and am not conveying any rights to any intellectual
 // property of any third parties.
 
-#import <jet.viz/metal_renderer.h>
-#import <jet.viz/metal_shader.h>
-#import <jet.viz/metal_window.h>
+#include <pch.h>
 
 #import "metal_preset_shaders.h"
 #import "metal_view.h"
 #import "mtlpp_wrappers.h"
 
+#import <jet.viz/metal_renderer.h>
+#import <jet.viz/metal_shader.h>
+#import <jet.viz/metal_vertex_buffer.h>
+#import <jet.viz/metal_window.h>
+
 #import <MetalKit/MetalKit.h>
 
-using namespace jet::viz;
+using namespace jet;
+using namespace viz;
 
 namespace {
 
 MetalShaderPtr g_shader;
-mtlpp::Buffer g_vertexBuffer;
+MetalVertexBufferPtr g_vertexBuffer;
 
-mtlpp::Drawable GetDrawable(const MetalWindow* window) {
+mtlpp::Drawable getCurrentDrawable(const MetalWindow* window) {
     return ns::Handle{
         (__bridge void*)((__bridge MTKView*)window->view()->GetPtr())
             .currentDrawable};
 }
 
-mtlpp::RenderPassDescriptor GetRenderPassDescriptor(const MetalWindow* window) {
+mtlpp::RenderPassDescriptor getCurrentRenderPassDescriptor(
+    const MetalWindow* window) {
     return ns::Handle{
         (__bridge void*)((__bridge MTKView*)window->view()->GetPtr())
             .currentRenderPassDescriptor};
 }
 
+mtlpp::VertexDescriptor createVertexDescripter(VertexFormat vertexFormat,
+                                               uint32_t bufferIndex) {
+    mtlpp::VertexDescriptor desc;
+    const MTLVertexDescriptor* vertexDescriptor =
+        (const MTLVertexDescriptor*)(desc.GetPtr());
+
+    uint32_t offset = 0;
+    int attributeId = 0;
+
+    if (static_cast<int>(vertexFormat & VertexFormat::Position3)) {
+        size_t numberOfFloats =
+            VertexHelper::getNumberOfFloats(VertexFormat::Position3);
+        vertexDescriptor.attributes[attributeId].format = MTLVertexFormatFloat3;
+        vertexDescriptor.attributes[attributeId].bufferIndex = bufferIndex;
+        vertexDescriptor.attributes[attributeId].offset = offset;
+        offset += numberOfFloats * sizeof(float);
+        ++attributeId;
+    }
+
+    if (static_cast<int>(vertexFormat & VertexFormat::Normal3)) {
+        size_t numberOfFloats =
+            VertexHelper::getNumberOfFloats(VertexFormat::Normal3);
+        vertexDescriptor.attributes[attributeId].format = MTLVertexFormatFloat3;
+        vertexDescriptor.attributes[attributeId].bufferIndex = bufferIndex;
+        vertexDescriptor.attributes[attributeId].offset = offset;
+        offset += numberOfFloats * sizeof(float);
+        ++attributeId;
+    }
+
+    if (static_cast<int>(vertexFormat & VertexFormat::TexCoord2)) {
+        size_t numberOfFloats =
+            VertexHelper::getNumberOfFloats(VertexFormat::TexCoord2);
+        vertexDescriptor.attributes[attributeId].format = MTLVertexFormatFloat2;
+        vertexDescriptor.attributes[attributeId].bufferIndex = bufferIndex;
+        vertexDescriptor.attributes[attributeId].offset = offset;
+        offset += numberOfFloats * sizeof(float);
+        ++attributeId;
+    }
+
+    if (static_cast<int>(vertexFormat & VertexFormat::TexCoord3)) {
+        size_t numberOfFloats =
+            VertexHelper::getNumberOfFloats(VertexFormat::TexCoord3);
+        vertexDescriptor.attributes[attributeId].format = MTLVertexFormatFloat3;
+        vertexDescriptor.attributes[attributeId].bufferIndex = bufferIndex;
+        vertexDescriptor.attributes[attributeId].offset = offset;
+        offset += numberOfFloats * sizeof(float);
+        ++attributeId;
+    }
+
+    if (static_cast<int>(vertexFormat & VertexFormat::Color4)) {
+        size_t numberOfFloats =
+            VertexHelper::getNumberOfFloats(VertexFormat::Color4);
+        vertexDescriptor.attributes[attributeId].format = MTLVertexFormatFloat4;
+        vertexDescriptor.attributes[attributeId].bufferIndex = bufferIndex;
+        vertexDescriptor.attributes[attributeId].offset = offset;
+        offset += numberOfFloats * sizeof(float);
+        ++attributeId;
+    }
+
+    vertexDescriptor.layouts[0].stride = offset;
+
+    return desc;
+}
+
+MetalPrivateRenderPipelineState* createRenderPipelineStateFromShader(
+    MetalPrivateDevice* device, MetalShaderPtr shader) {
+    mtlpp::RenderPipelineDescriptor renderPipelineDesc;
+    renderPipelineDesc.SetLabel(ns::String(shader->name().c_str()));
+    renderPipelineDesc.SetVertexFunction(shader->vertexFunction()->value);
+    renderPipelineDesc.SetFragmentFunction(shader->fragmentFunction()->value);
+    renderPipelineDesc.SetVertexDescriptor(
+        createVertexDescripter(shader->vertexFormat(),
+                               /* bufferIndex*/ 0));
+    renderPipelineDesc.GetColorAttachments()[0].SetPixelFormat(
+        mtlpp::PixelFormat::BGRA8Unorm);
+
+    NSLog(@"%lu", ((__bridge MTLVertexDescriptor*)renderPipelineDesc
+                       .GetVertexDescriptor()
+                       .GetPtr())
+                      .layouts[0]
+                      .stride);
+
+    JET_INFO << "Metal render pipeline state created with shader "
+             << shader->name();
+
+    return new MetalPrivateRenderPipelineState(
+        device->value.NewRenderPipelineState(renderPipelineDesc, nullptr));
+}
+
 }  // namespace
 
 MetalRenderer::MetalRenderer() {
-    const float vertexData[] = {
-        0.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
-    };
-    _device = new MetalDevice(mtlpp::Device::CreateSystemDefaultDevice());
-    _commandQueue = new MetalCommandQueue(_device->value.NewCommandQueue());
+    // Create device
+    _device =
+        new MetalPrivateDevice(mtlpp::Device::CreateSystemDefaultDevice());
 
-    g_shader = std::make_shared<MetalShader>(_device, RenderParameters(),
-                                             kSimpleColorShader);
+    // Create command queue
+    _commandQueue =
+        new MetalPrivateCommandQueue(_device->value.NewCommandQueue());
 
-    g_vertexBuffer = _device->value.NewBuffer(
-        vertexData, sizeof(vertexData),
-        mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
+    // TEMP
+    g_shader = std::static_pointer_cast<MetalShader>(
+        createPresetShader("simple_color"));
 
-    mtlpp::RenderPipelineDescriptor renderPipelineDesc;
-    renderPipelineDesc.SetVertexFunction(g_shader->vertexFunction()->value);
-    renderPipelineDesc.SetFragmentFunction(g_shader->fragmentFunction()->value);
-    renderPipelineDesc.GetColorAttachments()[0].SetPixelFormat(
-        mtlpp::PixelFormat::BGRA8Unorm);
-    _renderPipelineState = new MetalRenderPipelineState(
-        _device->value.NewRenderPipelineState(renderPipelineDesc, nullptr));
+    const float vertexData[] = {0.0f,  1.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+                                -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+                                1.0f,  -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
+
+    g_vertexBuffer =
+        std::make_shared<MetalVertexBuffer>(_device, g_shader, vertexData, 3);
 }
 
 MetalRenderer::~MetalRenderer() {
     delete _device;
     delete _commandQueue;
-    delete _renderPipelineState;
+
+    for (auto iter : _renderPipelineStates) {
+        delete iter.second;
+    }
 }
 
 VertexBufferPtr MetalRenderer::createVertexBuffer(const ShaderPtr& shader,
@@ -97,13 +192,24 @@ Texture3Ptr MetalRenderer::createTexture3(const ConstArrayView3<Color>& data) {
 ShaderPtr MetalRenderer::createPresetShader(
     const std::string& shaderName) const {
     RenderParameters params;
+    MetalShaderPtr shader;
 
     if (shaderName == "simple_color") {
-        return std::make_shared<MetalShader>(_device, params,
-                                             kSimpleColorShader);
+        shader = std::make_shared<MetalShader>(shaderName, _device, params,
+                                               VertexFormat::Position3Color4,
+                                               kSimpleColorShader);
     }
 
-    return nullptr;
+    if (shader) {
+        auto iter = _renderPipelineStates.find(shaderName);
+        if (iter == _renderPipelineStates.end()) {
+            auto renderPipelineState =
+                createRenderPipelineStateFromShader(_device, shader);
+            _renderPipelineStates[shaderName] = renderPipelineState;
+        }
+    }
+
+    return shader;
 }
 
 void MetalRenderer::setPrimitiveType(PrimitiveType type) {}
@@ -116,28 +222,44 @@ void MetalRenderer::render(const MetalWindow* window) {
     mtlpp::CommandBuffer commandBuffer = _commandQueue->value.CommandBuffer();
 
     mtlpp::RenderPassDescriptor renderPassDesc =
-        GetRenderPassDescriptor(window);
+        getCurrentRenderPassDescriptor(window);
     if (renderPassDesc) {
         mtlpp::RenderCommandEncoder renderCommandEncoder =
             commandBuffer.RenderCommandEncoder(renderPassDesc);
-        renderCommandEncoder.SetRenderPipelineState(
-            _renderPipelineState->value);
-        renderCommandEncoder.SetVertexBuffer(g_vertexBuffer, 0, 0);
-        renderCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, 0, 3);
+
+        // For each renderable...
+        auto iter = _renderPipelineStates.find(g_shader->name());
+        if (iter != _renderPipelineStates.end()) {
+            // renderer->bindShader(_shader);
+            auto renderPipelineState = iter->second;
+            renderCommandEncoder.SetRenderPipelineState(
+                renderPipelineState->value);
+
+            // renderer->bindVertexBuffer(_vertexBuffer);
+            renderCommandEncoder.SetVertexBuffer(
+                g_vertexBuffer->buffer()->value, /* offset */ 0,
+                /* buffer0 */ 0);
+
+            // renderer->setPrimitiveType(PrimitiveType::Triangles);
+            mtlpp::PrimitiveType primitiveType = mtlpp::PrimitiveType::Triangle;
+
+            // renderer->draw(_vertexBuffer->numberOfVertices());
+            renderCommandEncoder.Draw(primitiveType, /* vertexStart */ 0,
+                                      /* vertexCount */ 3);
+        }
+
         renderCommandEncoder.EndEncoding();
-        commandBuffer.Present(GetDrawable(window));
+        commandBuffer.Present(getCurrentDrawable(window));
     }
 
     commandBuffer.Commit();
     commandBuffer.WaitUntilCompleted();
 }
 
-MetalDevice* MetalRenderer::device() const { return _device; }
+MetalPrivateDevice* MetalRenderer::device() const { return _device; }
 
-MetalCommandQueue* MetalRenderer::commandQueue() const { return _commandQueue; }
-
-MetalRenderPipelineState* MetalRenderer::renderPipelineState() const {
-    return _renderPipelineState;
+MetalPrivateCommandQueue* MetalRenderer::commandQueue() const {
+    return _commandQueue;
 }
 
 void MetalRenderer::onRenderBegin() {}

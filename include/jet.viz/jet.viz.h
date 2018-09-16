@@ -28,6 +28,7 @@
 #include <jet.viz/metal_app.h>
 #include <jet.viz/metal_renderer.h>
 #include <jet.viz/metal_shader.h>
+#include <jet.viz/metal_vertex_buffer.h>
 #include <jet.viz/metal_window.h>
 #include <jet.viz/ortho_camera.h>
 #include <jet.viz/ortho_view_controller.h>
@@ -45,6 +46,7 @@
 #include <jet.viz/texture.h>
 #include <jet.viz/texture2.h>
 #include <jet.viz/texture3.h>
+#include <jet.viz/triangle_renderable.h>
 #include <jet.viz/vertex.h>
 #include <jet.viz/vertex_buffer.h>
 #include <jet.viz/view_controller.h>

@@ -9,6 +9,8 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
+
 namespace jet {
 namespace viz {
 

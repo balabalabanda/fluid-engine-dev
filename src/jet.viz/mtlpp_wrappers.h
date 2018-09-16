@@ -12,14 +12,15 @@
 namespace jet {
 namespace viz {
 
-#define MTLPP_WRAPPER_CLASS(Type)                                  \
-    class Metal##Type final {                                      \
-     public:                                                       \
-        mtlpp::Type value;                                         \
-        Metal##Type(const mtlpp::Type& val) : value(val) {}        \
-        Metal##Type(mtlpp::Type&& val) { value = std::move(val); } \
+#define MTLPP_WRAPPER_CLASS(Type)                                         \
+    class MetalPrivate##Type final {                                      \
+     public:                                                              \
+        mtlpp::Type value;                                                \
+        MetalPrivate##Type(const mtlpp::Type& val) : value(val) {}        \
+        MetalPrivate##Type(mtlpp::Type&& val) { value = std::move(val); } \
     };
 
+MTLPP_WRAPPER_CLASS(Buffer)
 MTLPP_WRAPPER_CLASS(CommandQueue)
 MTLPP_WRAPPER_CLASS(Device)
 MTLPP_WRAPPER_CLASS(Function)

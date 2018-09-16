@@ -8,6 +8,8 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
+
 #include <jet.viz/gl_texture3.h>
 
 using namespace jet;

@@ -17,17 +17,19 @@ using namespace jet::viz;
 // MARK: WindowViewController
 
 @interface WindowViewController : NSViewController<MTKViewDelegate> {
-    @public void (*render)(const MetalWindow&);
-    @public const MetalWindow* window;
+ @public
+    void (*render)(const MetalWindow&);
+ @public
+    const MetalWindow* window;
 }
 
 @end
 
 @implementation WindowViewController
--(void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
+- (void)mtkView:(nonnull MTKView*)view drawableSizeWillChange:(CGSize)size {
 }
 
--(void)drawInMTKView:(nonnull MTKView *)view {
+- (void)drawInMTKView:(nonnull MTKView*)view {
     (*render)(*window);
 }
 @end
@@ -38,14 +40,19 @@ MetalWindow::MetalWindow(const std::string& title, int width, int height) {
     _renderer = std::make_shared<MetalRenderer>();
 
     NSRect frame = NSMakeRect(0, 0, width, height);
-    NSWindow* window = [[NSWindow alloc] initWithContentRect:frame
+    NSWindow* window =
+        [[NSWindow alloc] initWithContentRect:frame
 #if MTLPP_IS_AVAILABLE_MAC(10_12)
-        styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable)
+                                    styleMask:(NSWindowStyleMaskTitled |
+                                               NSWindowStyleMaskClosable |
+                                               NSWindowStyleMaskResizable)
 #else
-        styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask)
+                                    styleMask:(NSTitledWindowMask |
+                                               NSClosableWindowMask |
+                                               NSResizableWindowMask)
 #endif
-        backing:NSBackingStoreBuffered
-        defer:NO];
+                                      backing:NSBackingStoreBuffered
+                                        defer:NO];
     window.title = [[NSProcessInfo processInfo] processName];
     WindowViewController* viewController = [WindowViewController new];
     viewController->render = MetalWindow::render;
@@ -60,18 +67,15 @@ MetalWindow::MetalWindow(const std::string& title, int width, int height) {
     [window center];
     [window orderFrontRegardless];
 
-    _view = new MetalView(ns::Handle{ (__bridge void*)view });
+    _view = new MetalView(ns::Handle{(__bridge void*)view});
 }
 
-MetalWindow::~MetalWindow() {
-    delete _view;
-}
+MetalWindow::~MetalWindow() { delete _view; }
 
-MetalView* MetalWindow::view() const {
-    return _view;
-}
+const MetalRendererPtr& MetalWindow::renderer() const { return _renderer; }
 
-void MetalWindow::render(const MetalWindow& window) {
+MetalView* MetalWindow::view() const { return _view; }
+
+/* static */ void MetalWindow::render(const MetalWindow& window) {
     window._renderer->render(&window);
 }
-

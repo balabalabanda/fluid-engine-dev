@@ -15,16 +15,25 @@ const char kSimpleColorShader[] = R"metal(
     #include <metal_stdlib>
     using namespace metal;
 
-    vertex float4 vertFunc(
-        const device packed_float3* vertexArray [[buffer(0)]],
-        unsigned int vID[[vertex_id]])
-    {
-        return float4(vertexArray[vID], 1.0);
+    struct VertexIn {
+        float3 position [[attribute(0)]];
+        float4 color    [[attribute(1)]];
+    };
+
+    struct VertexOut {
+        float4 position [[position]];
+        float4 color;
+    };
+
+    vertex VertexOut vertFunc(VertexIn vertexIn [[stage_in]]) {
+        VertexOut vertexOut;
+        vertexOut.position = float4(vertexIn.position, 1.0);
+        vertexOut.color = vertexIn.color;
+        return vertexOut;
     }
 
-    fragment half4 fragFunc()
-    {
-        return half4(1.0, 0.0, 0.0, 1.0);
+    fragment float4 fragFunc(VertexOut vert [[stage_in]]) {
+        return vert.color;
     }
 )metal";
 }

@@ -8,6 +8,7 @@
 
 #ifdef JET_USE_GL
 
+#include "gl_common.h"
 #include "gl_preset_shaders.h"
 
 #include <jet.viz/gl_index_buffer.h>

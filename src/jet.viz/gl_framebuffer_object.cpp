@@ -51,6 +51,8 @@
 
 #include <pch.h>
 
+#include "gl_common.h"
+
 #include <jet.viz/gl_framebuffer_object.h>
 #include <jet/logging.h>
 
